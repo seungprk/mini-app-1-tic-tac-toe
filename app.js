@@ -4,7 +4,7 @@ class App {
     this.table = this.ele.querySelector('table');
     this.board = this.createBoard(this.table);
     this.currentPlayer = 'x';
-    this.hasWon = false;
+    this.hasEnded = false;
 
     var resetButton = this.ele.querySelector('button');
     resetButton.addEventListener('click', this.reset.bind(this));
@@ -38,7 +38,7 @@ class App {
   }
 
   handleClick(newCell) {
-    if (this.hasWon === false && newCell.textContent !== 'x' && newCell.textContent !== 'o') { 
+    if (this.hasEnded === false && newCell.textContent !== 'x' && newCell.textContent !== 'o') { 
       this.setPiece(newCell);
 
       var nextPlayer = this.currentPlayer === 'x' ? 'o' : 'x'
@@ -85,7 +85,16 @@ class App {
     var rightDiagResult = this.board[0][2].textContent + this.board[1][1].textContent + this.board[2][0].textContent;
     results.push(rightDiagResult);
 
+    // Check if board is full
+    var straightBoard = ''
+    for (var i = 0; i < 3; i++) {
+      straightBoard += results[i];
+    }
+    if (straightBoard.indexOf('-') === -1) {
+      this.setWinner('-');
+    }
 
+    // Set winner
     results.forEach(function(result) {
       if (result === 'xxx') {
         this.setWinner('x');
@@ -96,13 +105,17 @@ class App {
   }
 
   setWinner(winner) {
-    this.hasWon = true;
-    this.ele.querySelector('.current-winner').textContent = 'Winner is ' + winner + '!'
+    this.hasEnded = true;
+    if (winner === '-') {
+      this.ele.querySelector('.current-winner').textContent = 'It\'s a tie!';
+    } else {
+      this.ele.querySelector('.current-winner').textContent = 'Winner is ' + winner + '!';
+    }
   }
 
   reset() {
     this.setCurrentPlayer('x');
-    this.hasWon = false;
+    this.hasEnded = false;
     this.ele.querySelector('.current-winner').textContent = '';
 
     // Clear board
