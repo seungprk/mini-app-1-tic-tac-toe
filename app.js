@@ -101,7 +101,16 @@ class App {
   }
 
   reset() {
-    console.log('TODO: app reset');
+    this.setCurrentPlayer('x');
+    this.hasWon = false;
+    this.ele.querySelector('.current-winner').textContent = '';
+
+    // Clear board
+    this.board.forEach(function(row) {
+      row.forEach(function(cell) {
+        cell.textContent = '-';
+      }.bind(this));
+    }.bind(this));
   }
 }
 
