@@ -1,0 +1,13 @@
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+td {
+  border: 1px solid;
+  height: 2rem;
+  width: 2rem;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}

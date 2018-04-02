@@ -86,7 +86,7 @@ class App {
   }
 
   createCellDOM(row, col) {
-    var newCell = window.document.createElement('th');
+    var newCell = window.document.createElement('td');
     newCell.textContent = '-';
     newCell.addEventListener('click', this.handleClick.bind(this, row, col, newCell));
     return newCell;
