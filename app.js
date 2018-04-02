@@ -36,10 +36,22 @@ class App {
 
   handleClick(newCell) {
     if (this.hasWon === false && newCell.textContent !== 'x' && newCell.textContent !== 'o') { 
-      newCell.textContent = this.currentPlayer === 'x' ? 'x' : 'o'
-      this.currentPlayer = this.currentPlayer === 'x' ? 'o' : 'x'
+      this.setPiece(newCell);
+
+      var nextPlayer = this.currentPlayer === 'x' ? 'o' : 'x'
+      this.setCurrentPlayer(nextPlayer);
+
       this.checkWinner();
     }
+  }
+
+  setPiece(cell) {
+    cell.textContent = this.currentPlayer === 'x' ? 'x' : 'o';
+  }
+
+  setCurrentPlayer(player) {
+    this.currentPlayer = this.currentPlayer === 'x' ? 'o' : 'x';
+    this.ele.querySelector('.current-player-name').textContent = this.currentPlayer;
   }
 
   checkWinner() {
