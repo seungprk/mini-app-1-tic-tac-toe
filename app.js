@@ -6,6 +6,9 @@ class App {
     this.currentPlayer = 'x';
     this.hasWon = false;
 
+    var resetButton = this.ele.querySelector('button');
+    resetButton.addEventListener('click', this.reset.bind(this));
+
     console.log('app created with dom node', this.ele);
   }
 
