@@ -1,13 +1,84 @@
+class Board {
+  constructor(len) {
+    this.len = len;
+    this.cells = '-'.repeat(len * len).split('');
+  }
+
+  canMakeMove(row, col) {
+    return !this.boardIsFull() && this.getCell(row, col) === '-';
+  }
+
+  boardIsFull() {
+    return !this.cells.includes('-');
+  }
+
+  getWinner() {
+    var results = [];
+
+    // Check row results
+    for (var i = 0; i < this.len; i++) {
+      var rowResult = '';
+      for (var j = 0; j < this.len; j++) {
+        rowResult += this.getCell(i, j);
+      }
+      results.push(rowResult);
+    }
+
+    // Check column results
+    for (var i = 0; i < this.len; i++) {
+      var colResult = '';
+      for (var j = 0; j < this.len; j++) {
+        colResult += this.getCell(j, i);
+      }
+      results.push(colResult);
+    }
+
+    // Check left diagonal results
+    var leftDiagResult = '';
+    for (var i = 0; i < this.len; i++) {
+      leftDiagResult += this.getCell(i, i);
+    }
+    results.push(leftDiagResult);
+
+    // Check right diagonal results
+    var rightDiagResult = '';
+    for (var i = 0; i < this.len; i++) {
+      rightDiagResult += this.getCell(i, this.len - 1 - i);
+    }
+    results.push(rightDiagResult);
+
+    for (var i = 0; i < results.length; i++) {
+      if (results[i] === 'xxx') {
+        return 'x';
+      } else if (results[i] === 'ooo') {
+        return 'o';
+      }
+    }
+
+    return null;
+  }
+
+  getCell(row, col) {
+    var index = row * this.len + col
+    return this.cells[index];
+  }
+
+  setCell(row, col, char) {
+    var index = row * this.len + col
+    this.cells[index] = char;
+  }
+}
+
 class App {
-  constructor(ele) {
+  constructor(len, ele) {
     // Vars
     this.ele = ele;
     this.currentPlayer = 'x';
-    this.hasEnded = false;
+    this.winner = null;
 
     var table = this.ele.querySelector('table');
     this.createBoardDOM(table);
-    this.board = this.createBoard();
+    this.board = new Board(len);
 
     // Handlers
     var resetButton = this.ele.querySelector('button');
@@ -32,27 +103,23 @@ class App {
     }
   }
 
-  createBoard() {
-    return [['-', '-', '-'], 
-            ['-', '-', '-'], 
-            ['-', '-', '-']];
-  }
-
-  handleClick(row, col, newCell) {
-    if (this.hasEnded === false && this.board[row][col] !== 'x' && this.board[row][col] !== 'o') { 
-      this.setPiece(row, col, newCell);
+  handleClick(row, col, cellDOM) {
+    if (this.winner === null && this.board.canMakeMove(row, col)) {
+      this.setPiece(row, col, cellDOM);
 
       var nextPlayer = this.currentPlayer === 'x' ? 'o' : 'x'
       this.setCurrentPlayer(nextPlayer);
 
-      this.checkWinner();
+      if (this.winner = this.board.getWinner()) {
+        this.setWinner(this.winner);
+      };
     }
   }
 
-  setPiece(row, col, cell) {
+  setPiece(row, col, cellDOM) {
     var selectChar = this.currentPlayer === 'x' ? 'x' : 'o';
-    this.board[row][col] = selectChar;
-    cell.textContent = selectChar;
+    this.board.setCell(row, col, selectChar);
+    cellDOM.textContent = selectChar;
   }
 
   setCurrentPlayer(player) {
@@ -60,55 +127,7 @@ class App {
     this.ele.querySelector('.current-player-name').textContent = player;
   }
 
-  checkWinner() {
-    var results = [];
-
-    // Check row results
-    this.board.forEach(function(row) {
-      var rowResult = row.reduce(function(accum, cell) {
-        return accum + cell
-      }, '');
-      results.push(rowResult);
-    });
-
-    // Check column results
-    for (var i = 0; i < 3; i++) {
-      var colResult = '';
-      for (var j = 0; j < 3; j++) {
-        colResult += this.board[j][i];
-      }
-      results.push(colResult);
-    }
-
-    // Check left diagonal results
-    var leftDiagResult = this.board[0][0] + this.board[1][1] + this.board[2][2];
-    results.push(leftDiagResult);
-
-    // Check right diagonal results
-    var rightDiagResult = this.board[0][2] + this.board[1][1] + this.board[2][0];
-    results.push(rightDiagResult);
-
-    // Check if board is full
-    var straightBoard = ''
-    for (var i = 0; i < 3; i++) {
-      straightBoard += results[i];
-    }
-    if (straightBoard.indexOf('-') === -1) {
-      this.setWinner('-');
-    }
-
-    // Set winner
-    results.forEach(function(result) {
-      if (result === 'xxx') {
-        this.setWinner('x');
-      } else if (result === 'ooo') {
-        this.setWinner('o');
-      }
-    }.bind(this));
-  }
-
   setWinner(winner) {
-    this.hasEnded = true;
     if (winner === '-') {
       this.ele.querySelector('.current-winner').textContent = 'It\'s a tie!';
     } else {
@@ -118,11 +137,11 @@ class App {
 
   reset() {
     this.setCurrentPlayer('x');
-    this.hasEnded = false;
     this.ele.querySelector('.current-winner').textContent = '';
+    this.winner = null;
 
     // Reset board
-    this.board = this.createBoard();
+    this.board = new Board(this.board.len);
     var table = this.ele.querySelector('table');
     while (table.hasChildNodes()) {
       table.removeChild(table.firstChild);
@@ -132,5 +151,5 @@ class App {
 }
 
 window.onload = function() {
-  window.app = new App(window.document.querySelector('.app'));
+  window.app = new App(3, window.document.querySelector('.app'));
 };
