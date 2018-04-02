@@ -112,7 +112,9 @@ class App {
 
       if (this.winner = this.board.getWinner()) {
         this.setWinner(this.winner);
-      };
+      } else if (this.board.boardIsFull()) {
+        this.setWinner('-');
+      }
     }
   }
 
