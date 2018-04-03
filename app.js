@@ -138,7 +138,7 @@ class App {
   }
 
   reset() {
-    this.setCurrentPlayer('x');
+    this.setCurrentPlayer(this.winner || 'x');
     this.ele.querySelector('.current-winner').textContent = '';
     this.winner = null;
 
