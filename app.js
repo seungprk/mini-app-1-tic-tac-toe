@@ -73,10 +73,17 @@ class GameState {
   constructor(startPlayer) {
     this.currentPlayer = startPlayer || 'x';
     this.winner = null;
+    this.winsX = 0;
+    this.winsO = 0;
   }
 
   setWinner(winner) {
     this.winner = winner;
+    if (winner === 'x') {
+      this.winsX++;
+    } else if (winner === 'o') {
+      this.winsO++;
+    }
   }
 
   togglePlayer() {
@@ -90,6 +97,14 @@ class GameState {
   getPlayer() {
     return this.currentPlayer;
   }
+
+  getWinsX() {
+    return this.winsX;
+  }
+
+  getWinsO() {
+    return this.winsO;
+  }
 }
 
 class App {
@@ -98,6 +113,7 @@ class App {
     this.ele = ele;
     var table = this.ele.querySelector('table');
     this.createBoardDOM(table);
+    this.setupPlayerNames();
 
     // Separation of concerns
     this.board = new Board(len);
@@ -106,6 +122,17 @@ class App {
     // Handlers
     var resetButton = this.ele.querySelector('button');
     resetButton.addEventListener('click', this.reset.bind(this));
+  }
+
+  setupPlayerNames() {
+    var playerOneName = prompt('Please enter name for Player 1 (x):');
+    var playerTwoName = prompt('Please enter name for Player 2 (o):');
+
+    this.ele.querySelector('.player-one-name').textContent = playerOneName;
+    this.ele.querySelector('.player-two-name').textContent = playerTwoName;
+
+    this.ele.querySelector('.wins-player-one').textContent = playerOneName + ': ';
+    this.ele.querySelector('.wins-player-two').textContent = playerTwoName + ': ';
   }
 
   createCellDOM(row, col) {
@@ -133,6 +160,7 @@ class App {
       var currWinner = this.board.getWinner();
       if (currWinner) {
         this.setWinner(currWinner);
+        this.setWinnerCount(currWinner);
       } else if (this.board.boardIsFull()) {
         this.setWinner('-');
         this.gameState.togglePlayer();
@@ -161,6 +189,14 @@ class App {
       this.ele.querySelector('.current-winner').textContent = 'It\'s a tie!';
     } else {
       this.ele.querySelector('.current-winner').textContent = 'Winner is ' + winner + '!';
+    }
+  }
+
+  setWinnerCount(winner) {
+    if (winner === 'x') {
+      this.ele.querySelector('.wins-x').textContent = this.gameState.getWinsX();
+    } else if (winner === 'o') {
+      this.ele.querySelector('.wins-o').textContent = this.gameState.getWinsO();
     }
   }
 
