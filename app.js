@@ -135,6 +135,8 @@ class App {
         this.setWinner(currWinner);
       } else if (this.board.boardIsFull()) {
         this.setWinner('-');
+        this.gameState.togglePlayer();
+        this.setCurrentPlayer(this.gameState.getPlayer());
       } else {
         this.gameState.togglePlayer();
         this.setCurrentPlayer(this.gameState.getPlayer());
