@@ -69,16 +69,39 @@ class Board {
   }
 }
 
+class GameState {
+  constructor(startPlayer) {
+    this.currentPlayer = startPlayer || 'x';
+    this.winner = null;
+  }
+
+  setWinner(winner) {
+    this.winner = winner;
+  }
+
+  togglePlayer() {
+    this.currentPlayer = this.currentPlayer === 'x' ? 'o' : 'x';
+  }
+
+  getWinner() {
+    return this.winner;
+  }
+
+  getPlayer() {
+    return this.currentPlayer;
+  }
+}
+
 class App {
   constructor(len, ele) {
-    // Vars
+    // DOM related
     this.ele = ele;
-    this.currentPlayer = 'x';
-    this.winner = null;
-
     var table = this.ele.querySelector('table');
     this.createBoardDOM(table);
+
+    // Separation of concerns
     this.board = new Board(len);
+    this.gameState = new GameState();
 
     // Handlers
     var resetButton = this.ele.querySelector('button');
@@ -104,32 +127,34 @@ class App {
   }
 
   handleClick(row, col, cellDOM) {
-    if (this.winner === null && this.board.canMakeMove(row, col)) {
+    if (this.gameState.getWinner() === null && this.board.canMakeMove(row, col)) {
       this.setPiece(row, col, cellDOM);
 
-      var nextPlayer = this.currentPlayer === 'x' ? 'o' : 'x'
-      this.setCurrentPlayer(nextPlayer);
-
-      if (this.winner = this.board.getWinner()) {
-        this.setWinner(this.winner);
+      var currWinner = this.board.getWinner();
+      if (currWinner) {
+        this.setWinner(currWinner);
       } else if (this.board.boardIsFull()) {
         this.setWinner('-');
+      } else {
+        this.gameState.togglePlayer();
+        this.setCurrentPlayer(this.gameState.getPlayer());
       }
     }
   }
 
   setPiece(row, col, cellDOM) {
-    var selectChar = this.currentPlayer === 'x' ? 'x' : 'o';
+    var selectChar = this.gameState.getPlayer();
     this.board.setCell(row, col, selectChar);
     cellDOM.textContent = selectChar;
   }
 
   setCurrentPlayer(player) {
-    this.currentPlayer = player;
     this.ele.querySelector('.current-player-name').textContent = player;
   }
 
   setWinner(winner) {
+    this.gameState.setWinner(winner);
+
     if (winner === '-') {
       this.ele.querySelector('.current-winner').textContent = 'It\'s a tie!';
     } else {
@@ -138,9 +163,9 @@ class App {
   }
 
   reset() {
-    this.setCurrentPlayer(this.winner || 'x');
+    this.setCurrentPlayer(this.gameState.getPlayer());
     this.ele.querySelector('.current-winner').textContent = '';
-    this.winner = null;
+    this.gameState.setWinner(null);
 
     // Reset board
     this.board = new Board(this.board.len);
